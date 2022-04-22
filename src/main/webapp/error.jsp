@@ -2,14 +2,14 @@
   Created by IntelliJ IDEA.
   User: ALB
   Date: 2022-04-21
-  Time: 11:24
+  Time: 19:44
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%--错误页面，登录失败的时候跳转到这里--%>
 <html>
 <head>
     <title>Title</title>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -29,8 +29,8 @@
             margin-top: 150px;
             /*暂时就把margintop设置这么多吧，后面还要在顶部添加title*/
         }
-    </style>
 
+    </style>
 </head>
 <body>
 <script
@@ -46,22 +46,29 @@
         integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
         crossorigin="anonymous"></script>
 <%--登录页面信息提交表单--%>
-<%--前端向后端发送请求，记得一定要加项目名--%>
+<%--前端向后端发送请求，记得一定要加项目名--%>、
+<div class="alert alert-warning alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span>
+    </button>
+    <strong>Warning!</strong>Better check your acount and password,avoid being hacked,Login again!
+</div>
 <form class="login" action="${pageContext.request.contextPath}/Login" method="post">
     <div class="form-group">
         <label for="exampleInputEmail1">Username</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Acount" name="username">
+        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Acount">
     </div>
     <div class="form-group">
         <label for="exampleInputPassword1">Password</label>
-        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password">
+        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
     </div>
+
     <div class="checkbox">
         <label>
             <input type="checkbox" name="checkobx" value="yes"> 十天内免登录
         </label>
     </div>
-    <button type="submit" class="btn btn-success">Submit</button>
+    <button type="submit" class="btn btn-success">Login</button>
 </form>
+
 </body>
 </html>

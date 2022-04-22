@@ -1,6 +1,7 @@
 package com.example.Trade;
 
 import com.example.DButil.Util;
+import com.example.ManagerInfo.User;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -28,24 +29,33 @@ public class Login extends HttpServlet {
         }
     }
 
-    private void doLogin(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
-        String useername = request.getParameter("useername");
+    private void doLogin(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException, ServletException {
+        String username = request.getParameter("username");
         String password = request.getParameter("password");
         boolean success=false;
+        User user=new User();
 
+        //登录验证
         PreparedStatement statement =null;
         Connection connection= Util.getconnection();
         ResultSet resultSet=null;
-        String sql="select * from employee where fname=? and password=?";
-        connection.prepareStatement(sql);
-        statement.setString(1,useername);
+        String sql="select * from manager where fname=? and password=?";
+        statement=connection.prepareStatement(sql);
+        statement.setString(1,username);
         statement.setString(2,password);
         resultSet=statement.executeQuery();
         while(resultSet.next()) {
            success=true;
         }
         if(success){
-            response.sendRedirect("/Panel.jsp");
+            user.setUsername(username);
+            user.setPassword(password);
+            //将用户姓名绑定到请求域中，并使用转发机制进行请求转发，跳转到管理页面
+            request.setAttribute("userinfo",user);
+            request.getRequestDispatcher("/Panel.jsp").forward(request,response);
+        }else{
+            String contextPath = request.getContextPath();
+            response.sendRedirect(contextPath+"/error.jsp");
         }
 
     }

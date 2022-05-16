@@ -14,7 +14,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>Login</title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/Resources/css/bootstrap.min.css"
@@ -50,7 +49,7 @@
 <form class="login" action="${pageContext.request.contextPath}/Login" method="post">
     <div class="form-group">
         <label for="exampleInputEmail1">Username</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Acount" name="username">
+        <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Acount" name="username">
     </div>
     <div class="form-group">
         <label for="exampleInputPassword1">Password</label>

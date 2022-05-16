@@ -14,8 +14,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <title>Login</title>
-
     <!-- Bootstrap -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/Resources/css/bootstrap.min.css"
           integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
@@ -55,19 +53,18 @@
 <form class="login" action="${pageContext.request.contextPath}/Login" method="post">
     <div class="form-group">
         <label for="exampleInputEmail1">Username</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Acount">
+        <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Acount" name="username">
     </div>
     <div class="form-group">
         <label for="exampleInputPassword1">Password</label>
-        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password">
     </div>
-
     <div class="checkbox">
         <label>
             <input type="checkbox" name="checkobx" value="yes"> 十天内免登录
         </label>
     </div>
-    <button type="submit" class="btn btn-success">Login</button>
+    <button type="submit" class="btn btn-success">Submit</button>
 </form>
 
 </body>

@@ -100,7 +100,7 @@
             <ul class="nav nav-justified">
 
                 <li class="active">
-                    <a href="${pageContext.request.contextPath}/Panel.jsp">雇员管理</a>
+                    <a href="${pageContext.request.contextPath}/getEmployee">雇员管理</a>
                 </li>
                 <li>
                     <a href="">交易管理</a>
@@ -154,7 +154,7 @@
                            onclick="javascript:window.location.href='${pageContext.request.contextPath}/employee/details?idnumber=${employee.id}'">
                     <input type="button" value="修改"
                            class="btn btn-info"
-                           onclick="javascript:window.location.href='${pageContext.request.contextPath}/employee/alter_receiver?idnumber=${employee.id}'">
+                           onclick="javascript:window.location.href='${pageContext.request.contextPath}/employee/alter?idnumber=${employee.id}'">
                 </td>
             </tr>
         </c:forEach>

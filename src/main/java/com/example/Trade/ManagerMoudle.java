@@ -21,7 +21,7 @@ import static java.awt.SystemColor.info;
 
 @WebServlet({("/getEmployee"), ("/employee/delete"),
         ("/employee/details"), ("/employee/alter"),
-        ("/search"), ("alter_receiver"),("/modify")})
+        ("/search"), ("/employee/modify")})
 public class ManagerMoudle extends HttpServlet {
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response)
@@ -51,13 +51,13 @@ public class ManagerMoudle extends HttpServlet {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        } else if ("alter_receiver".equals(servletPath)) {
+        } else if ("/employee/alter".equals(servletPath)) {
             try {
-                alter_receiver(request, response);
+                send_placeholder(request, response);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-        }else if("/modify".equals(servletPath)){
+        } else if ("/employee/modify".equals(servletPath)) {
             try {
                 modify(request, response);
             } catch (SQLException e) {
@@ -66,172 +66,201 @@ public class ManagerMoudle extends HttpServlet {
         }
     }
 
-    private void modify(HttpServletRequest request, HttpServletResponse response) throws SQLException {
-        String id=request.getParameter("id");
+    private void modify(HttpServletRequest request, HttpServletResponse response) throws SQLException, IOException {
+        String id = request.getParameter("id");
+        String department=request.getParameter("department");
+        String branch = request.getParameter("branch");
         String title = request.getParameter("title");
-        String department = request.getParameter("department");
-        DBUtil util=new DBUtil();
-        Connection connection=util.getConnection();
+        int departmentId = Integer.parseInt(department);
+        int branchId = Integer.parseInt(branch);
+        DBUtil db = new DBUtil();
+        Connection connection=db.getConnection();
         String sql="update employee\n" +
-                "set title=?\n" +
-                "and dept_id=? \n" +
-                "where emp_id=?";
+                "set dept_id=?,assigned_branch_id=?,title=? \n" +
+                "where emp_id=?\n" +
+                "\n";
         PreparedStatement statement=connection.prepareStatement(sql);
-        statement.setString(1,title);
-        statement.setString(2,department);
-        statement.setString(3,id);
-    }
-
-    private void alter_receiver(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        String idnumber = request.getParameter("idnumber");
-        EmployeeDetail details = new EmployeeDetail();
-        DBUtil util=new DBUtil();
-        Connection connection=util.getConnection();
-        String sql="SELECT\n" +
-                "\temployee.emp_id, \n" +
-                "\temployee.fname, \n" +
-                "\temployee.lname\n" +
-                "FROM\n" +
-                "\temployee\n" +
-                "WHERE\n" +
-                "\temployee.emp_id = ?";
-        PreparedStatement statement=connection.prepareStatement(sql);
-        statement.setString(1,idnumber);
-        ResultSet resultSet=statement.executeQuery();
-        while(resultSet.next()) {
-            details.setId(resultSet.getString(1));
-            details.setFname(resultSet.getString(2));
-            details.setLname(resultSet.getString(3));
+        statement.setInt(1,departmentId);
+        statement.setInt(2,branchId);
+        statement.setString(3,title);
+        statement.setString(4,id);
+        int count = statement.executeUpdate();
+        boolean success=false;
+        if(count==1){
+            success=true;
         }
-        request.setAttribute("placehold_info",details);
-        request.getRequestDispatcher("/alter.jsp").forward(request,response);
+        if(success){
+            String contextPath = request.getContextPath();
+            response.sendRedirect(contextPath+"/getEmployee");
+        }
 
     }
 
-    private void searchEmployees(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
-        String search_name = request.getParameter("search_name");
+    private void send_placeholder(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        String idnumber = request.getParameter("idnumber");
         EmployeeDetail details = new EmployeeDetail();
         DBUtil util = new DBUtil();
         Connection connection = util.getConnection();
-        String sql = "SELECT\n" +
-                "\ta.fname, \n" +
-                "\ta.lname, \n" +
-                "\ta.start_date, \n" +
-                "\ta.title as '职称',\n" +
-                "\tbranch.`name` as '分支名称', \n" +
-                "\tbranch.address, \n" +
-                "\tbranch.city, \n" +
-                "\tbranch.state, \n" +
-                "\tbranch.zip, \n" +
-                "\tb.fname, \n" +
-                "\tb.lname,\n" +
-                "\tdepartment.`name` as '部门名'\n" +
-                "FROM\n" +
-                "\temployee AS a\n" +
-                "\tINNER JOIN\n" +
-                "\tbranch\n" +
-                "\tON \n" +
-                "\t\ta.assigned_branch_id = branch.branch_id\n" +
-                "\tINNER JOIN\n" +
-                "\tdepartment\n" +
-                "\tON \n" +
-                "\t\ta.dept_id = department.dept_id\n" +
-                "\tINNER JOIN\n" +
-                "\temployee AS b\n" +
-                "\tON \n" +
-                "\t\tbranch.branch_id = b.assigned_branch_id AND\n" +
-                "\t\tdepartment.dept_id = b.dept_id\n" +
-                "WHERE\n" +
-                "\ta.fname like CONCAT(?,'%')\n" +
-                "\tLIMIT 1";
-        PreparedStatement statement = connection.prepareStatement(sql);
-        statement.setString(1, search_name);
-        ResultSet resultSet = statement.executeQuery();
-        while (resultSet.next()) {
-            details.setFname(resultSet.getString(1));
-            details.setLname(resultSet.getString(2));
-            details.setStart_date(resultSet.getString(3));
-            details.setTitle(resultSet.getString(4));
-            details.setBranch_name(resultSet.getString(5));
-            details.setBranch_address(resultSet.getString(6));
-            details.setBranch_city(resultSet.getString(7));
-            details.setBranch_state(resultSet.getString(8));
-            details.setBranch_zip(resultSet.getString(9));
-            details.setSupervisor_fname(resultSet.getString(10));
-            details.setSupervisor_lname(resultSet.getString(11));
-            details.setDepartment(resultSet.getString(12));
-        }
-        request.setAttribute("details", details);
-        request.getRequestDispatcher("/employeedetail.jsp").forward(request, response);
-        util.close(connection, statement, resultSet);
-    }
-
-    private void getEmployeedetails(HttpServletRequest request, HttpServletResponse response) throws SQLException {
-
-        String idnumber = request.getParameter("idnumber");
-        EmployeeDetail details = new EmployeeDetail();
-        //详情信息需要返回的信息
-        DBUtil util = new DBUtil();
-        Connection connection = util.getConnection();
-        String sql = "SELECT\n" +
-                "\ta.fname, \n" +
-                "\ta.lname, \n" +
-                "\ta.start_date, \n" +
-                "\ta.title, \n" +
-                "\tbranch.`name`, \n" +
-                "\tbranch.address, \n" +
-                "\tbranch.city, \n" +
-                "\tbranch.state, \n" +
-                "\tbranch.zip, \n" +
-                "\tb.fname, \n" +
-                "\tb.lname,\n" +
-                "\tdepartment.`name`\n" +
-                "FROM\n" +
-                "\temployee AS a\n" +
-                "\tINNER JOIN\n" +
-                "\tbranch\n" +
-                "\tON \n" +
-                "\t\ta.assigned_branch_id = branch.branch_id\n" +
-                "\tINNER JOIN\n" +
-                "\tdepartment\n" +
-                "\tON \n" +
-                "\t\ta.dept_id = department.dept_id\n" +
-                "\tINNER JOIN\n" +
-                "\temployee AS b\n" +
-                "\tON \n" +
-                "\t\tbranch.branch_id = b.assigned_branch_id AND\n" +
-                "\t\tdepartment.dept_id = b.dept_id\n" +
-                "WHERE\n" +
-                "\ta.superior_emp_id = b.emp_id and a.emp_id = ?";
+        String sql = "select fname,lname from \n" +
+                "employee where emp_id=?";
         PreparedStatement statement = connection.prepareStatement(sql);
         statement.setString(1, idnumber);
         ResultSet resultSet = statement.executeQuery();
         while (resultSet.next()) {
             details.setFname(resultSet.getString(1));
             details.setLname(resultSet.getString(2));
-            details.setStart_date(resultSet.getString(3));
-            details.setTitle(resultSet.getString(4));
-            details.setBranch_name(resultSet.getString(5));
-            details.setBranch_address(resultSet.getString(6));
-            details.setBranch_city(resultSet.getString(7));
-            details.setBranch_state(resultSet.getString(8));
-            details.setBranch_zip(resultSet.getString(9));
-            details.setSupervisor_fname(resultSet.getString(10));
-            details.setSupervisor_lname(resultSet.getString(11));
-            details.setDepartment(resultSet.getString(12));
         }
+        details.setId(idnumber);
+        util.close(connection, statement, resultSet);
+        request.setAttribute("details", details);
+        request.getRequestDispatcher("/alter.jsp").forward(request, response);
+    }
 
-        try {
-            //将具体信息绑定到请求域中
-            //请求转发到详情页面
-            request.setAttribute("details", details);
-            request.getRequestDispatcher("/employeedetail.jsp").forward(request, response);
-        } catch (ServletException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+
+    private void searchEmployees(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+        String search_name = request.getParameter("search_name");
+        EmployeeDetail details1 = new EmployeeDetail();
+        EmployeeDetail details2 = new EmployeeDetail();
+        DBUtil util1 = new DBUtil();
+        Connection connection1 = util1.getConnection();
+        String sql1 = "SELECT\n" +
+                "\ta.fname, \n" +
+                "\ta.lname, \n" +
+                "\tb.fname, \n" +
+                "\tb.lname\n" +
+                "FROM\n" +
+                "\temployee AS a,\n" +
+                "\temployee AS b\n" +
+                "WHERE\n" +
+                "\ta.superior_emp_id = b.emp_id\n" +
+                "\tand a.fname like CONCAT(?,'%')\n" +
+                "\tLIMIT 1";
+        PreparedStatement statement1 = connection1.prepareStatement(sql1);
+        statement1.setString(1, search_name);
+        ResultSet resultSet1 = statement1.executeQuery();
+        while (resultSet1.next()) {
+            details1.setFname(resultSet1.getString(1));
+            details1.setLname(resultSet1.getString(2));
+            details1.setSupervisor_fname(resultSet1.getString(3));
+            details1.setSupervisor_lname(resultSet1.getString(4));
+        }
+        util1.close(connection1, statement1, resultSet1);
+        DBUtil util2 = new DBUtil();
+        Connection connection2 = util2.getConnection();
+        String sql2 = "SELECT\n" +
+                "\temployee.start_date, \n" +
+                "\tdepartment.`name` as '部门名称', \n" +
+                "\tbranch.`name` as '分支名称', \n" +
+                "\tbranch.address, \n" +
+                "\tbranch.city, \n" +
+                "\tbranch.state, \n" +
+                "\tbranch.zip, \n" +
+                "\temployee.title\n" +
+                "FROM\n" +
+                "\temployee\n" +
+                "\tINNER JOIN\n" +
+                "\tdepartment\n" +
+                "\tON \n" +
+                "\t\temployee.dept_id = department.dept_id\n" +
+                "\tINNER JOIN\n" +
+                "\tbranch\n" +
+                "\tON \n" +
+                "\t\temployee.assigned_branch_id = branch.branch_id\n" +
+                "\t\tand employee.fname like CONCAT(?,'%')";
+        PreparedStatement statement2 = connection2.prepareStatement(sql2);
+        statement2.setString(1, search_name);
+        ResultSet resultSet2 = statement2.executeQuery();
+        while (resultSet2.next()) {
+            details2.setStart_date(resultSet2.getString(1));
+            details2.setDepartment(resultSet2.getString(2));
+            details2.setBranch_name(resultSet2.getString(3));
+            details2.setBranch_address(resultSet2.getString(4));
+            details2.setBranch_city(resultSet2.getString(5));
+            details2.setBranch_state(resultSet2.getString(6));
+            details2.setBranch_zip(resultSet2.getString(7));
+            details2.setTitle(resultSet2.getString(8));
+        }
+        util2.close(connection2, statement2, resultSet2);
+        request.setAttribute("details", details1);
+        request.setAttribute("details2", details2);
+        request.getRequestDispatcher("/employeedetail.jsp").forward(request, response);
+
+    }
+
+    //获取详细信息的时候，仅仅通过一次的多表联查会出问题的，需要使用多个查询
+    //将19个雇员的详细信息全部查询出来
+    private void getEmployeedetails(HttpServletRequest request, HttpServletResponse response) throws SQLException, ServletException, IOException {
+
+        String idnumber = request.getParameter("idnumber");
+        //该对象用于封装雇员姓名和上级领导的姓名
+        EmployeeDetail details = new EmployeeDetail();
+        EmployeeDetail details2 = new EmployeeDetail();
+        //详情信息需要返回的信息
+        DBUtil util = new DBUtil();
+        Connection connection = util.getConnection();
+        String sql1 = "SELECT\n" +
+                "\ta.fname, \n" +
+                "\ta.lname, \n" +
+                "\t\n" +
+                "\tb.fname, \n" +
+                "\tb.lname\n" +
+                "FROM\n" +
+                "\temployee AS a,\n" +
+                "\temployee AS b\n" +
+                "WHERE\n" +
+                "\ta.superior_emp_id = b.emp_id and a.emp_id=?";
+        PreparedStatement statement = connection.prepareStatement(sql1);
+        statement.setString(1, idnumber);
+        ResultSet resultSet = statement.executeQuery();
+        while (resultSet.next()) {
+            String Fname = resultSet.getString(1);
+            details.setFname(resultSet.getString(1));
+            details.setLname(resultSet.getString(2));
+            details.setSupervisor_fname(resultSet.getString(3));
+            details.setSupervisor_lname(resultSet.getString(4));
         }
         util.close(connection, statement, resultSet);
+        //该语句用于查询雇员入职时间，部门名称、所在分支的信息、职称
+        String sql2 = "SELECT\n" +
+                "\temployee.start_date, \n" +
+                "\tdepartment.`name`, \n" +
+                "\tbranch.`name`, \n" +
+                "\tbranch.address, \n" +
+                "\tbranch.city, \n" +
+                "\tbranch.state, \n" +
+                "\tbranch.zip, \n" +
+                "\temployee.title\n" +
+                "FROM\n" +
+                "\temployee\n" +
+                "\tINNER JOIN\n" +
+                "\tdepartment\n" +
+                "\tON \n" +
+                "\t\temployee.dept_id = department.dept_id\n" +
+                "\tINNER JOIN\n" +
+                "\tbranch\n" +
+                "\tON \n" +
+                "\t\temployee.assigned_branch_id = branch.branch_id\n" +
+                "\t\tand employee.emp_id=?";
+        DBUtil util2 = new DBUtil();
+        Connection connection2 = util2.getConnection();
+        PreparedStatement statement1 = connection2.prepareStatement(sql2);
+        statement1.setString(1, idnumber);
+        ResultSet resultSet1 = statement1.executeQuery();
+        while (resultSet1.next()) {
+            details2.setStart_date(resultSet1.getString(1));
+            details2.setDepartment(resultSet1.getString(2));
+            details2.setBranch_name(resultSet1.getString(3));
+            details2.setBranch_address(resultSet1.getString(4));
+            details2.setBranch_city(resultSet1.getString(5));
+            details2.setBranch_state(resultSet1.getString(6));
+            details2.setBranch_zip(resultSet1.getString(7));
+            details2.setTitle(resultSet1.getString(8));
+        }
+        util2.close(connection2, statement1, resultSet1);
+        //将两个对象都转发页面中，这样就能解决查不出全部数据的bug
+        request.setAttribute("details", details);
+        request.setAttribute("details2", details2);
+        request.getRequestDispatcher("/employeedetail.jsp").forward(request, response);
 
     }
 
@@ -298,8 +327,5 @@ public class ManagerMoudle extends HttpServlet {
         request.getRequestDispatcher("/Panel.jsp").forward(request, response);
         db.close(connection, statement, resultSet);
     }
-
     //获取雇员信息列表
-
-
 }

@@ -20,6 +20,60 @@
     <link rel="canonical" href="https://getbootstrap.com/docs/3.4/examples/justified-nav/">
     <script src="https://fastly.jsdelivr.net/npm/@bootcss/v3.bootcss.com@1.0.35/assets/js/ie-emulation-modes-warning.js"></script>
 
+    <style>
+        #before {
+            box-sizing: border-box;
+        }
+
+        .container {
+            padding-right: 0px;
+            padding-left: 0px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        .nav {
+            padding-left: 0;
+            margin-bottom: 0;
+            list-style: none;
+        }
+
+        .nav-justified {
+            background-color: #eee;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            max-height: 52px;
+        }
+
+        .nav-justified li a {
+            padding-top: 15px;
+            padding-bottom: 15px;
+            margin-bottom: 0;
+            font-weight: 700;
+            color: #777;
+            text-align: center;
+        ] background-color: #e5e5e5;
+            backround-repeat: repeat-x;
+            border-bottom: 1px solid #d5d5d5;
+            border-right: 1px solid #d5d5d5;
+            border-left: 1px solid #d5d5d5;
+        }
+
+        ol, ul {
+            margin-top: 0;
+        }
+
+        ul {
+            display: block;
+            margin-block-start: 1em;
+            margin-block-end: 1em;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+            padding-inline-start: 40px;
+        }
+    </style>
+
 </head>
 <body>
 <script
@@ -36,7 +90,7 @@
 <div class="container">
     <div class="masthead">
         <h3 class="text-muted" id="before">OA_system</h3>
-        <nav>ss's's
+        <nav>
             <ul class="nav nav-justified">
 
                 <li class="active">
@@ -60,7 +114,13 @@
             </ul>
         </nav>
     </div>
-    <form action="/modify" method="post" class="form-horizontal">
+    <br>
+    <ol class="breadcrumb">
+        <li><a href="${pageContext.request.contextPath}/getEmployee">首页</a></li>
+        <li class="active"><a href="#">雇员信息修改</a></li>
+    </ol>
+    <br>
+    <form action="${pageContext.request.contextPath}/employee/modify" method="post" class="form-horizontal">
         <div class="form-group">
             <label for="id" class="col-sm-2 control-label">内部编号：</label>
             <div class="col-sm-10">
@@ -83,7 +143,7 @@
         <div class="form-group">
             <label for="title" class="col-sm-2 control-label">职位：</label>
             <div class="col-sm-10">
-                <select name="title" id="title">
+                <select name="title" id="title" class="form-select">
                     <option value="Vice President">Vice President</option>
                     <option value="Treasurer">Treasurer</option>
                     <option value="Operations Manager">Operations Manager</option>
@@ -97,21 +157,30 @@
         <div class="form-group">
             <label for="department" class="col-sm-2 control-label">部门：</label>
             <div class="col-sm-10">
-                <select name="department" id="department" >
+                <select name="department" id="department" class="form-select" >
                     <option value="1">Operations</option>
                     <option value="2">Loans</option>
                     <option value="3">Adminstration</option>
                 </select>
             </div>
         </div>
+        <div class="form-group">
+            <label for="branch" class="col-sm-2 control-label">分支：</label>
+            <div class="col-sm-10">
+                <select name="branch" id="branch" class="form-select">
+                    <option value="1">Headquarters</option>
+                    <option value="2">Woburn Branch</option>
+                    <option value="3">Qunicy Branch</option>
+                    <option value="4">So. NH Branch </option>
+                </select>
+            </div>
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">确认修改</button>
+        </div>
     </form>
     <br>
     <br>
-    <ol class="breadcrumb">
-        <li><a href="${pageContext.request.contextPath}/getEmployee">首页</a></li>
-        <li class="active"><a href="#">雇员信息修改</a></li>
-    </ol>
 </div>
-
 </body>
 </html>

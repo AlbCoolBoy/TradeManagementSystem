@@ -124,35 +124,35 @@
             </tr>
             <tr>
                 <td>职位：</td>
-                <td>${details.title}</td>
+                <td>${details2.title}</td>
             </tr>
             <tr>
                 <td>所在部门：</td>
-                <td>${details.department}</td>
+                <td>${details2.department}</td>
             </tr>
             <tr>
                 <td>入职时间：</td>
-                <td>${details.start_date}</td>
+                <td>${details2.start_date}</td>
             </tr>
             <tr>
                 <td>所属分区：</td>
-                <td>${details.branch_name}</td>
+                <td>${details2.branch_name}</td>
             </tr>
             <tr>
                 <td>分区地址：</td>
-                <td>${details.branch_address}</td>
+                <td>${details2.branch_address}</td>
             </tr>
             <tr>
                 <td>所在城市：</td>
-                <td>${details.branch_city}</td>
+                <td>${details2.branch_city}</td>
             </tr>
             <tr>
                 <td>所在州：</td>
-                <td>${details.branch_state}</td>
+                <td>${details2.branch_state}</td>
             </tr>
             <tr>
                 <td>邮编：</td>
-                <td>${details.branch_zip}</td>
+                <td>${details2.branch_zip}</td>
             </tr>
             <tr>
                 <td>上级领导：</td>
